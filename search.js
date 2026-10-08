@@ -9,5 +9,40 @@ const WIKI_INDEX=[["Dirt", "item-dirt", "Blocks", "img/i2.png"], ["Stone", "item
   box.addEventListener('keydown',e=>{ const L=out.querySelectorAll('a[data-i]'); if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); sel=Math.max(0,Math.min(L.length-1,sel+(e.key==='ArrowDown'?1:-1))); L.forEach((a,i)=>a.classList.toggle('on',i===sel)); }
     else if(e.key==='Enter'){ const a=L[sel>=0?sel:0]; if(a) location.href=a.getAttribute('href'); } else if(e.key==='Escape'){ out.style.display='none'; } });
   document.addEventListener('click',e=>{ if(!e.target.closest('.search')) out.style.display='none'; });
-  const m=document.querySelector('.menu'), n=document.querySelector('nav.side'); if(m&&n) m.addEventListener('click',()=>n.classList.toggle('open'));
+  const m=document.querySelector('.menu'), n=document.querySelector('nav.side'), scrim=document.querySelector('.scrim'), toc=document.getElementById('toc');
+  const phone=()=>matchMedia('(max-width:820px)').matches;
+  const closeAll=()=>{ if(n) n.classList.remove('open'); if(toc) toc.hidden=true; if(scrim) scrim.hidden=true; };
+  if(m&&n) m.addEventListener('click',()=>{ const open=!n.classList.contains('open'); closeAll(); if(open){ n.classList.add('open'); if(phone()&&scrim) scrim.hidden=false; } });
+  if(scrim) scrim.addEventListener('click',closeAll); document.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeAll(); });
+  const main=document.querySelector('main');
+  // tables with headings get labels on each cell, so a phone can show every row as a card
+  for(const t of main.querySelectorAll('table')){ if(t.classList.contains('rt')||t.closest('.infobox')) continue; const hs=[...t.querySelectorAll('thead th')].map(th=>th.textContent.trim()); if(!hs.length||hs.length>7) continue;
+    t.classList.add('cards'); for(const tr of t.querySelectorAll('tbody tr')) [...tr.children].forEach((td,i)=>td.setAttribute('data-label',hs[i]||'')); }
+  // the headings on this page, for the Contents sheet; on long pages the sections fold
+  const heads=[...main.querySelectorAll(':scope > h2, :scope > h3')]; let k=0;
+  for(const h of heads) if(!h.id) h.id='s'+(++k);
+  const list=toc&&toc.querySelector('.toclist'); if(list) list.innerHTML=heads.map(h=>`<a href="#${h.id}" class="${h.tagName==='H3'&&main.querySelector(':scope > h2')?'sub':''}">${h.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</a>`).join('');
+  const tb=document.querySelector('[data-tab="toc"]'); if(tb&&heads.length<2) tb.disabled=true;
+  // long lists and recipe sets show their first few entries, with a button for the rest
+  if(phone()) for(const L of main.querySelectorAll('table.rt tbody, table.cards tbody, ul, ol:not(.line)')){ if(L.closest('nav,.infobox,.results')) continue; const rows=[...L.children]; if(rows.length<=14) continue;
+    rows.slice(8).forEach(r=>r.classList.add('more')); const b=document.createElement('button'); b.className='foldall showmore'; b.textContent=`Show all ${rows.length}`;
+    b.addEventListener('click',()=>{ const shut=!rows[8].classList.contains('more'); rows.slice(8).forEach(r=>r.classList.toggle('more',shut)); b.textContent=shut?`Show all ${rows.length}`:'Show fewer'; });
+    (L.tagName==='TBODY'?L.parentNode:L).after(b); }
+  const fold=phone()&&heads.length>=2&&main.scrollHeight>innerHeight*4;
+  if(fold){ for(const h of heads){ const sec=document.createElement('div'); sec.className='sec shut'; let el=h.nextSibling; const lv=+h.tagName[1];
+      while(el&&!(el.nodeType===1&&/^H[23]$/.test(el.tagName)&&+el.tagName[1]<=lv)&&el.tagName!=='FOOTER'){ const nx=el.nextSibling; sec.appendChild(el); el=nx; }
+      h.after(sec); h.classList.add('fold','shut'); h.addEventListener('click',()=>{ const s=h.classList.toggle('shut'); sec.classList.toggle('shut',s); }); }
+    const all=document.createElement('button'); all.className='foldall'; all.textContent='Open all sections'; let open=false;
+    all.addEventListener('click',()=>{ open=!open; for(const h of heads){ h.classList.toggle('shut',!open); h.nextElementSibling.classList.toggle('shut',!open); } all.textContent=open?'Close all sections':'Open all sections'; });
+    heads[0].before(all); if(heads.length<5){ heads[0].classList.remove('shut'); heads[0].nextElementSibling.classList.remove('shut'); } }
+  const openTo=id=>{ const h=document.getElementById(id); if(!h) return; if(h.classList.contains('shut')){ h.classList.remove('shut'); h.nextElementSibling.classList.remove('shut'); } h.scrollIntoView({block:'start'}); scrollBy(0,-(document.querySelector('.top').offsetHeight+6)); };
+  if(list) list.addEventListener('click',e=>{ const a=e.target.closest('a'); if(!a) return; e.preventDefault(); closeAll(); openTo(a.getAttribute('href').slice(1)); });
+  if(location.hash) setTimeout(()=>openTo(location.hash.slice(1)),50);
+  // the phone bar: back, home, search, contents, play
+  const bar=document.querySelector('.tabbar'); if(bar) bar.addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(!b) return; const t=b.dataset.tab;
+    if(t==='back'){ if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin) history.back(); else location.href='index.html'; }
+    else if(t==='search'){ closeAll(); scrollTo(0,0); box.focus(); show(); }
+    else if(t==='toc'){ const was=!toc.hidden; closeAll(); if(!was){ toc.hidden=false; scrim.hidden=false; } } });
+  const up=document.querySelector('.totop'); if(up){ addEventListener('scroll',()=>{ up.hidden=!(phone()&&scrollY>innerHeight*1.5); },{passive:true}); up.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'})); }
+  if(phone()){ const rs=()=>{ out.style.top=(document.querySelector('.top').getBoundingClientRect().bottom)+'px'; }; box.addEventListener('focus',rs); addEventListener('resize',rs); }
 })();
