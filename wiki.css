@@ -66,3 +66,7 @@ ol.line{ display:flex; flex-wrap:wrap; gap:6px 18px; padding:0; list-style:none;
 }
 @media (max-width:820px){ .wrap{ grid-template-columns:1fr; } nav.side{ display:none; position:static; max-height:none; border:none; border-bottom:1px solid var(--edge); } nav.side.open{ display:block; } .menu{ display:block; }
   main{ padding:14px 16px 50px; } .infobox{ float:none; width:auto; margin:0 0 14px; } .top .brand small{ display:none; } }
+.bio{ display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:14px; align-items:start; margin:14px 0 20px; padding-bottom:16px; border-bottom:1px solid var(--edge); scroll-margin-top:64px; }
+.bio figure{ margin:0; } .bio img{ display:block; width:100%; height:auto; image-rendering:pixelated; border:1px solid var(--edge); border-radius:6px; background:#0d0a14; }
+.bio h3{ margin:0 0 6px; } .bio p{ margin:0 0 6px; }
+@media (max-width:820px){ .bio{ grid-template-columns:1fr; gap:8px; } }
