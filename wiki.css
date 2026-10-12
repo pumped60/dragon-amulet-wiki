@@ -35,8 +35,10 @@ ol.line{ display:flex; flex-wrap:wrap; gap:6px 18px; padding:0; list-style:none;
   .search{ order:3; flex-basis:100%; max-width:none; margin:0; } .search input{ padding:11px 12px; font-size:16px; border-radius:10px; }
   .results{ position:fixed; top:auto; left:0; right:0; max-height:calc(100vh - 170px); border-radius:0; border-left:0; border-right:0; }
   .results a{ padding:12px 14px; min-height:48px; border-bottom:1px solid var(--edge); } .results img{ width:26px; height:26px; }
-  .wrap nav.side{ display:block!important; position:fixed; z-index:30; top:0; bottom:0; left:0; width:min(84vw,320px); max-height:none; padding:calc(16px + env(safe-area-inset-top)) 10px 90px;
-    background:var(--paper); border-right:1px solid var(--edge); transform:translateX(-105%); transition:transform .2s ease; overflow:auto; }
+  .wrap nav.side{ display:block!important; position:fixed; z-index:30; top:0; left:0; height:100vh; height:100dvh; align-self:stretch; width:min(84vw,320px); max-height:none; padding:calc(16px + env(safe-area-inset-top)) 10px 90px;   /* a set height: the grid's align-self:start let it grow past the screen, so it could never scroll */
+    background:var(--paper); border-right:1px solid var(--edge); transform:translateX(-105%); transition:transform .2s ease; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; touch-action:pan-y; }
+  body.navlock{ overflow:hidden; position:fixed; left:0; right:0; }   /* the page behind an open menu or sheet does not scroll (iPhones ignore overflow:hidden alone) */
+  .sheet .toclist{ overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
   .wrap nav.side.open{ transform:none; box-shadow:8px 0 30px rgba(0,0,0,.3); } .wrap nav.side a{ padding:11px 10px; font-size:16px; border-radius:8px; }
   main{ padding:14px 14px 30px; } h1{ font-size:24px; } h2{ font-size:19px; } h3{ font-size:17px; }
   .grid,.grid.big{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .card{ padding:10px; min-height:52px; font-size:14px; } .card img{ width:26px; height:26px; }

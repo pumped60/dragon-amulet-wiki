@@ -17,8 +17,11 @@ const WIKI_INDEX=[["Dirt", "item-dirt", "Blocks", "img/i2.png"], ["Stone", "item
   document.addEventListener('click',e=>{ if(!e.target.closest('.search')) out.style.display='none'; });
   const m=document.querySelector('.menu'), n=document.querySelector('nav.side'), scrim=document.querySelector('.scrim'), toc=document.getElementById('toc');
   const phone=()=>matchMedia('(max-width:820px)').matches;
-  const closeAll=()=>{ if(n) n.classList.remove('open'); if(toc) toc.hidden=true; if(scrim) scrim.hidden=true; };
-  if(m&&n) m.addEventListener('click',()=>{ const open=!n.classList.contains('open'); closeAll(); if(open){ n.classList.add('open'); if(phone()&&scrim) scrim.hidden=false; } });
+  // while the menu or the Contents sheet is open on a phone, the page behind is held still and only the menu scrolls
+  let lockY=null; const lock=()=>{ if(!phone()||lockY!=null) return; lockY=scrollY; document.body.style.top=(-lockY)+'px'; document.body.classList.add('navlock'); };
+  const unlock=()=>{ if(lockY==null) return; document.body.classList.remove('navlock'); document.body.style.top=''; scrollTo(0,lockY); lockY=null; };
+  const closeAll=()=>{ if(n) n.classList.remove('open'); if(toc) toc.hidden=true; if(scrim) scrim.hidden=true; unlock(); };
+  if(m&&n) m.addEventListener('click',()=>{ const open=!n.classList.contains('open'); closeAll(); if(open){ n.classList.add('open'); if(phone()&&scrim) scrim.hidden=false; lock(); const on=n.querySelector('a.on'); if(on&&phone()) n.scrollTop=Math.max(0,on.offsetTop-n.clientHeight/2); } });
   if(scrim) scrim.addEventListener('click',closeAll); document.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeAll(); });
   const main=document.querySelector('main');
   // tables with headings get labels on each cell, so a phone can show every row as a card
@@ -48,7 +51,7 @@ const WIKI_INDEX=[["Dirt", "item-dirt", "Blocks", "img/i2.png"], ["Stone", "item
   const bar=document.querySelector('.tabbar'); if(bar) bar.addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(!b) return; const t=b.dataset.tab;
     if(t==='back'){ if(history.length>1&&document.referrer&&new URL(document.referrer).origin===location.origin) history.back(); else location.href='index.html'; }
     else if(t==='search'){ closeAll(); scrollTo(0,0); box.focus(); show(); }
-    else if(t==='toc'){ const was=!toc.hidden; closeAll(); if(!was){ toc.hidden=false; scrim.hidden=false; } } });
+    else if(t==='toc'){ const was=!toc.hidden; closeAll(); if(!was){ toc.hidden=false; scrim.hidden=false; lock(); } } });
   const up=document.querySelector('.totop'); if(up){ addEventListener('scroll',()=>{ up.hidden=!(phone()&&scrollY>innerHeight*1.5); },{passive:true}); up.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'})); }
   if(phone()){ const rs=()=>{ out.style.top=(document.querySelector('.top').getBoundingClientRect().bottom)+'px'; }; box.addEventListener('focus',rs); addEventListener('resize',rs); }
 })();
