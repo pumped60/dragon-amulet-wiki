@@ -15,7 +15,7 @@ nav.side h4{ margin:14px 6px 4px; font-size:11px; letter-spacing:.08em; text-tra
 nav.side a:hover{ background:var(--row); text-decoration:none; } nav.side a.on{ background:var(--accent); color:#fff; } nav.side a span{ color:var(--muted); font-size:12px; } nav.side a.on span{ color:#e8e2f4; }
 main{ padding:20px 28px 60px; min-width:0; } .crumbs{ font-size:13px; color:var(--muted); margin-bottom:6px; }
 h1{ font-size:28px; margin:0 0 10px; color:var(--head); border-bottom:2px solid var(--edge); padding-bottom:6px; } h2{ font-size:20px; color:var(--head); border-bottom:1px solid var(--edge); padding-bottom:3px; margin:24px 0 8px; } h3{ font-size:16px; color:var(--head); margin:16px 0 6px; }
-.lead{ font-size:16px; } img{ image-rendering:pixelated; } img.ic{ width:20px; height:20px; vertical-align:-4px; margin-right:4px; } .n{ color:var(--muted); font-size:13px; }
+.lead{ font-size:16px; } img{ image-rendering:pixelated; } img.ic{ width:20px; height:20px; vertical-align:-4px; margin-right:4px; } img.medal{ width:40px; height:40px; vertical-align:middle; } .rt.ach td:first-child{ width:48px; } .n{ color:var(--muted); font-size:13px; }
 a.il{ white-space:nowrap; } .arr{ color:var(--muted); margin:0 4px; } .at{ color:var(--muted); font-size:13px; }
 .infobox{ float:right; width:290px; margin:0 0 14px 20px; background:var(--paper); border:1px solid var(--edge); border-radius:8px; overflow:hidden; font-size:14px; }
 .ibt{ background:var(--head); color:var(--paper); font-weight:700; text-align:center; padding:7px; } .ibp{ text-align:center; padding:14px; background:var(--row); } .ibp img{ max-width:100%; max-height:160px; min-width:64px; }
