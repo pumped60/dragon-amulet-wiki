@@ -9,6 +9,9 @@ a{ color:var(--accent); text-decoration:none; } a:hover{ text-decoration:underli
 .results{ position:absolute; top:100%; left:0; right:0; background:var(--paper); border:1px solid var(--edge); border-radius:6px; max-height:60vh; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.25); }
 .results a{ display:flex; align-items:center; gap:8px; padding:6px 10px; color:var(--ink); } .results a:hover,.results a.on{ background:var(--row); text-decoration:none; } .results small{ color:var(--muted); margin-left:auto; }
 .results img{ width:20px; height:20px; image-rendering:pixelated; }
+.results a.askrow{ font-weight:bold; border-left:4px solid #ffcf3a; } .results a.askrow b{ color:#c08a00; }
+.results .anshead{ padding:6px 10px 2px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+.results a.ansrow{ display:block; } .results a.ansrow span{ display:block; font-size:13px; color:var(--muted); margin-top:2px; } .results mark{ background:#ffcf3a55; color:inherit; }
 .wrap{ display:grid; grid-template-columns:230px minmax(0,1fr); max-width:1280px; margin:0 auto; }
 nav.side{ padding:16px 12px; border-right:1px solid var(--edge); position:sticky; top:52px; align-self:start; max-height:calc(100vh - 52px); overflow:auto; font-size:14px; }
 nav.side h4{ margin:14px 6px 4px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); } nav.side a{ display:flex; justify-content:space-between; padding:3px 6px; border-radius:4px; color:var(--ink); }

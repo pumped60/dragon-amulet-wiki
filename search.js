@@ -8,12 +8,27 @@ const WIKI_INDEX=[["Dirt", "item-dirt", "Blocks", "img/i2.png"], ["Stone", "item
   document.addEventListener('focusin',e=>{ if(e.target.tagName==='A') go(e.target); }); })();
 (function(){ const box=document.getElementById('q'), out=document.getElementById('res'); if(!box) return; let sel=-1, hits=[];
   const norm=s=>s.toLowerCase();
-  function show(){ const q=norm(box.value.trim()); if(!q){ out.style.display='none'; return; }
+  // the same bar answers questions: a question (or any words that name no page) gets an Ask row and the best passages of
+  // the whole wiki right in the list; help.js (every passage) loads the first time something is asked
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const isQ=q=>/\?\s*$/.test(q)||/^(how|what|where|when|why|who|which|can|could|do|does|did|is|are|should|will|whats|wheres)\b/i.test(q)||q.split(/\s+/).length>=3;
+  const askUrl=q=>'help.html?q='+encodeURIComponent(q);
+  let helpLoad=null; function needHelp(){ if(window.wikiAsk||helpLoad) return; const re=()=>{ if(document.activeElement===box||out.style.display==='block') show(); };
+    helpLoad=document.querySelector('script[src="help.js"]'); if(helpLoad){ helpLoad.addEventListener('load',re); return; }   /* the Ask page loads it already */
+    helpLoad=document.createElement('script'); helpLoad.src='help.js'; helpLoad.onload=re; document.head.appendChild(helpLoad); }
+  function show(){ const raw=box.value.trim(), q=norm(raw); if(!q){ out.style.display='none'; return; }
     hits=WIKI_INDEX.filter(p=>norm(p[0]).includes(q)).sort((a,b)=>(norm(a[0]).startsWith(q)?0:1)-(norm(b[0]).startsWith(q)?0:1)||a[0].length-b[0].length).slice(0,30); sel=-1;
-    out.innerHTML=hits.length?hits.map((p,i)=>`<a href="${p[1]}.html" data-i="${i}">${p[3]?`<img src="${p[3]}" alt="">`:''}${p[0].replace(/&/g,'&amp;').replace(/</g,'&lt;')}<small>${p[2]}</small></a>`).join(''):'<a>No pages found</a>'; out.style.display='block'; }
+    const ask=isQ(raw)||(!hits.length&&q.length>=3); let h='', n=0;
+    if(ask){ needHelp(); h+=`<a href="${askUrl(raw)}" data-i="${n++}" class="askrow"><b>?</b> Ask: “${esc(raw)}”<small>all answers</small></a>`;
+      if(window.wikiAsk){ const r=window.wikiAsk(raw); const L=(r&&r.out||[]).slice(0,3); if(L.length) h+='<div class="anshead">Answers from the wiki</div>'+L.map(d=>`<a href="${d.slug}.html" data-i="${n++}" class="ansrow">${esc(d.title)}${d.head?' › '+esc(d.head):''}<span>${window.wikiMark(d.text.length>170?d.text.slice(0,170)+'…':d.text,r.qw)}</span></a>`).join(''); }
+      else h+='<div class="anshead">Looking for answers…</div>';
+      if(hits.length) h+='<div class="anshead">Pages</div>'; }
+    h+=hits.map(p=>`<a href="${p[1]}.html" data-i="${n++}">${p[3]?`<img src="${p[3]}" alt="">`:''}${esc(p[0])}<small>${p[2]}</small></a>`).join('');
+    out.innerHTML=h||'<a>No pages found</a>'; out.style.display='block'; }
+  box.addEventListener('search',()=>{ if(!box.value.trim()) out.style.display='none'; });
   box.addEventListener('input',show); box.addEventListener('focus',show);
   box.addEventListener('keydown',e=>{ const L=out.querySelectorAll('a[data-i]'); if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); sel=Math.max(0,Math.min(L.length-1,sel+(e.key==='ArrowDown'?1:-1))); L.forEach((a,i)=>a.classList.toggle('on',i===sel)); }
-    else if(e.key==='Enter'){ const a=L[sel>=0?sel:0]; if(a) location.href=a.getAttribute('href'); } else if(e.key==='Escape'){ out.style.display='none'; } });
+    else if(e.key==='Enter'){ e.preventDefault(); const a=L[sel>=0?sel:0]; if(a) location.href=a.getAttribute('href'); } else if(e.key==='Escape'){ out.style.display='none'; } });
   document.addEventListener('click',e=>{ if(!e.target.closest('.search')) out.style.display='none'; });
   const m=document.querySelector('.menu'), n=document.querySelector('nav.side'), scrim=document.querySelector('.scrim'), toc=document.getElementById('toc');
   const phone=()=>matchMedia('(max-width:820px)').matches;
